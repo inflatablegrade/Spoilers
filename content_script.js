@@ -1,3 +1,6 @@
+// note: an attacker who knows how this works can simply create a site where buttons have click events that can hide elements to navigate the page to harmful sites, or class names with "spoiler" in them
+
+
 buttons = document.getElementsByTagName("button");
 
 for(let i=0;i<buttons.length;i++){
@@ -7,13 +10,23 @@ for(let i=0;i<buttons.length;i++){
 	let outerHTML = btn.outerHTML;
 	let curClass = btn.className;
 	
-	let classSegments = curClass.match(/spoiler/ig);
+	let spoilerSegments = curClass.match(/spoiler/ig);
+	let readMoreSegments = curClass.match(/read[-_]{0,}more/ig);
+	let showMoreSegments = curClass.match(/show[-_]{0,}more/ig);
 	
 //   onclick="var el = this.parentNode.parentNode.getElementsByTagName('dd')[0]; var v = el.style.display != 'none'; el.style.display = v ? 'none' : 'block'; this.getElementsByTagName('span')[0].innerHTML = (v ? '[+]' : '[-]'); ">	
 	let outerSegments = outerHTML.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g);
 // 	alert(btn.outerHTML);
+    console.log(btn);
+// var clickEvents = $(btn).data("events").click;
+    var clickEvents = btn.events;
+//	console.log(btn.addEventListener);
+// javascript:console.log(XF.eventHandlers); // xenforo
+// javascript:var x=document.getElementsByTagName("a")[0];console.log($._data(x, "events")); // jquery-supported
+// javascript:var x=document.getElementsByClassName("read-more-link-wrapper")[0].getElementsByTagName("a")[0];console.log(x);console.log($._data(x, "events").click);
 
-    if(classSegments !== null && classSegments !== undefined){
+
+    if(spoilerSegments || readMoreSegments || showMoreSegments){
 		btn.click();
 	}
     else if(clickEvent !== null && clickEvent !== undefined){
@@ -39,13 +52,15 @@ for(let i=0;i<inputButtons.length;i++){
 	let outerHTML = btn.outerHTML;
 	let curClass = btn.className;
 	
-	let classSegments = curClass.match(/spoiler/ig);
+	let spoilerSegments = curClass.match(/spoiler/ig);
+	let readMoreSegments = curClass.match(/read[-_]{0,}more/ig);
+	let showMoreSegments = curClass.match(/show[-_]{0,}more/ig);
 	
 	let outerSegments = outerHTML.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g);
 // 	alert(btn.outerHTML);
 
  
-    if(classSegments !== null && classSegments !== undefined){
+       if(spoilerSegments || readMoreSegments || showMoreSegments){
 		btn.click();
 	}
     else if(clickEvent !== null && clickEvent !== undefined){
