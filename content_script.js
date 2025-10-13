@@ -1,205 +1,112 @@
-// note: an attacker who knows how this works can simply create a site where buttons have click events that can hide elements to navigate the page to harmful sites, or class names with "spoiler" in them
-
-
-buttons = document.getElementsByTagName("button");
-
-for(let i=0;i<buttons.length;i++){
-	let btn = buttons[i];
-	let clickEvent = btn.onclick;
-	let type = btn.type;
-	let outerHTML = btn.outerHTML;
-	let curClass = btn.className;
-	
-	let spoilerSegments = curClass.match(/spoiler/ig);
-	let readMoreSegments = curClass.match(/read[-_]{0,}more/ig);
-	let showMoreSegments = curClass.match(/show[-_]{0,}more/ig);
-	
-//   onclick="var el = this.parentNode.parentNode.getElementsByTagName('dd')[0]; var v = el.style.display != 'none'; el.style.display = v ? 'none' : 'block'; this.getElementsByTagName('span')[0].innerHTML = (v ? '[+]' : '[-]'); ">	
-	let outerSegments = outerHTML.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g);
-// 	alert(btn.outerHTML);
-    console.log(btn);
-// var clickEvents = $(btn).data("events").click;
-    var clickEvents = btn.events;
-//	console.log(btn.addEventListener);
-// javascript:console.log(XF.eventHandlers); // xenforo
-// javascript:var x=document.getElementsByTagName("a")[0];console.log($._data(x, "events")); // jquery-supported
-// javascript:var x=document.getElementsByClassName("read-more-link-wrapper")[0].getElementsByTagName("a")[0];console.log(x);console.log($._data(x, "events").click);
-
-
-    if(spoilerSegments || readMoreSegments || showMoreSegments){
-		btn.click();
+var itmArrays = {
+	"div": {	
+		"indicesArray":[]
+		},
+	"span": {	
+		"indicesArray":[]
+		},
+	"blockquote": {	
+		"indicesArray":[]
+		}
 	}
-    else if(clickEvent !== null && clickEvent !== undefined){
-//		alert(1);
-        let segments = clickEvent.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g);
-	
-	    if(segments.length>0 && btn.type == "button"){
-		    btn.click();
-	    }
+
+
+function handleElementsByTagName(elementType){
+	let itms = document.getElementsByTagName(elementType);
+
+	for(let i=0; i<itms.length; i++){
+		let itm = itms[i];
+		let onClickEvent = itm.onclick;
+		let outerHTML = itm.outerHTML;
+		let curClass = itm.className;
+
+		let spoilerSegments = curClass.match(/spoiler/ig);
+		let readMoreSegments = curClass.match(/read[-_]{0,}more/ig);
+		let showMoreSegments = curClass.match(/show[-_]{0,}more/ig);		
+		let outerSegments = outerHTML.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g);
+
+		if(spoilerSegments || readMoreSegments || showMoreSegments){
+			console.log("clicking " + elementType);
+			itm.click();
+		}
+		else if(onClickEvent){
+			if(onClickEvent.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g)){
+				if(elementType=="input" && itm.type == "button"){
+					itm.click();
+				}
+				else if(elementType != "button"){
+					itm.click();
+				}
+			}
+		}
+		else if(outerSegments){
+			itm.click();
+		}
+
 	}
-	else if(outerSegments !== null && outerSegments !== undefined){
-		btn.click();
-	}
+
 }
 
 
-inputButtons = document.getElementsByTagName("input");
+function handleElementsByTagNameNested(elementType){
+	let itms = document.getElementsByTagName(elementType);
 
-for(let i=0;i<inputButtons.length;i++){
-	let btn = inputButtons[i];
-	let clickEvent = btn.onclick;
-	let type = btn.type;
-	let outerHTML = btn.outerHTML;
-	let curClass = btn.className;
-	
-	let spoilerSegments = curClass.match(/spoiler/ig);
-	let readMoreSegments = curClass.match(/read[-_]{0,}more/ig);
-	let showMoreSegments = curClass.match(/show[-_]{0,}more/ig);
-	
-	let outerSegments = outerHTML.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g);
-// 	alert(btn.outerHTML);
+	for(let i=0; i<itms.length; i++){
+		let itm = itms[i];
+		let onClickEvent = itm.onclick;
+		let outerHTML = itm.outerHTML;
+		let curClass = itm.className;
 
- 
-       if(spoilerSegments || readMoreSegments || showMoreSegments){
-		btn.click();
+		let spoilerSegments = curClass.match(/spoiler/ig);
+		let readMoreSegments = curClass.match(/read[-_]{0,}more/ig);
+		let showMoreSegments = curClass.match(/show[-_]{0,}more/ig);		
+		let outerSegments = outerHTML.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g);
+
+		if(handleInnerSpoilerDiv(itm)==1){
+//			itm.click();
+			itmArrays[elementType].indicesArray.push(i);
+			console.log("div, no subs");
+		}
+
+//		if(spoilerSegments || readMoreSegments || showMoreSegments){
+//			itm.click();
+//		}
+		else if(onClickEvent){
+			if(onClickEvent.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g)){
+				itm.click();
+			}
+		}
+		else if(outerSegments){
+			itm.click();
+		}
+
 	}
-    else if(clickEvent !== null && clickEvent !== undefined){
-//		alert(1);
-        let segments = clickEvent.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g);
-	
-	    if(segments.length>0 && btn.type == "button"){
-		    btn.click();
-	    }
-	}
-	else if(outerSegments !== null && outerSegments !== undefined && btn.type == "button"){
-		btn.click();
-	}
+
 }
 
 
+handleElementsByTagName("button");
+handleElementsByTagName("input");
+handleElementsByTagName("a");
 
 
-linkButtons = document.getElementsByTagName("a");
+handleElementsByTagNameNested("div");
+handleElementsByTagNameNested("span");
+handleElementsByTagNameNested("blockquote");
 
-for(let i=0;i<linkButtons.length;i++){
-	let btn = linkButtons[i];
-	let clickEvent = btn.onclick;
-	let outerHTML = btn.outerHTML;
-	let curClass = btn.className;
-	
-	let classSegments = curClass.match(/spoiler/ig);
-	
-//   onclick="var el = this.parentNode.parentNode.getElementsByTagName('dd')[0]; var v = el.style.display != 'none'; el.style.display = v ? 'none' : 'block'; this.getElementsByTagName('span')[0].innerHTML = (v ? '[+]' : '[-]'); ">	
-	let outerSegments = outerHTML.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g);
-// 	alert(btn.outerHTML);
 
-    if(classSegments !== null && classSegments !== undefined){
-		btn.click();
+function clickIndex(elementType){
+	let ims = document.getElementsByTagName(elementType);
+
+	for(let i=0;i<itmArrays[elementType].indicesArray.length;i++){
+		ims[itmArrays[elementType].indicesArray[i]].click();	
+		
 	}
-    else if(clickEvent !== null && clickEvent !== undefined){
-//		alert(1);
-        let segments = clickEvent.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g);
-	
-	    if(segments.length>0){
-		    btn.click();
-	    }
-	}
-	else if(outerSegments !== null && outerSegments !== undefined){
-		btn.click();
-	}
-}  
-
-
-
-
-
-
-
-
-divButtons = document.getElementsByTagName("div");
-divIndices = [];
-spanIndices = [];
-
-for(let i=0;i<divButtons.length;i++){
-	let btn = divButtons[i];
-	let clickEvent = btn.onclick;
-	let outerHTML = btn.outerHTML;
-	let curClass = btn.className;
-	
-	
-//   onclick="var el = this.parentNode.parentNode.getElementsByTagName('dd')[0]; var v = el.style.display != 'none'; el.style.display = v ? 'none' : 'block'; this.getElementsByTagName('span')[0].innerHTML = (v ? '[+]' : '[-]'); ">	
-	let outerSegments = outerHTML.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g);
-// 	alert(btn.outerHTML);
-
-    if(handleInnerSpoilerDiv(btn)==1){
-//		btn.click();
-		divIndices.push(i);
-		console.log("div, no subs");
-	}
-    else if(clickEvent !== null && clickEvent !== undefined){
-//		alert(1);
-        let segments = clickEvent.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g);
-	
-	    if(segments.length>0){
-		    btn.click();
-			console.log("div, click event");
-	    }
-	}
-	else if(outerSegments !== null && outerSegments !== undefined){
-		btn.click();
-		console.log("div, onclick");
-	}
-}  
-// clicking sub-nodes triggers the parent nodes too
-// divs can be made to work like buttons and input buttons, though there might be divs whose class names have "spoiler" that strictly function as spoiler containers rather than actual content spoilers
-// when you come across one and if the script so far didn't work, just click the innermost node with such a class (click only if it's the first node with "spoiler")
-
-
-spanButtons = document.getElementsByTagName("span");
-
-for(let i=0;i<spanButtons.length;i++){
-	let btn = spanButtons[i];
-	let clickEvent = btn.onclick;
-	let outerHTML = btn.outerHTML;
-	let curClass = btn.className;
-	
-	
-//   onclick="var el = this.parentNode.parentNode.getElementsByTagName('dd')[0]; var v = el.style.display != 'none'; el.style.display = v ? 'none' : 'block'; this.getElementsByTagName('span')[0].innerHTML = (v ? '[+]' : '[-]'); ">	
-	let outerSegments = outerHTML.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g);
-// 	alert(btn.outerHTML);
-
-    if(handleInnerSpoilerDiv(btn)==1){
-//		btn.click();
-        spanIndices.push(i);
-		console.log("span, no subs");
-	}
-    else if(clickEvent !== null && clickEvent !== undefined){
-//		alert(1);
-        let segments = clickEvent.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g);
-	
-	    if(segments.length>0){
-		    btn.click();
-			console.log("span, click event");
-	    }
-	}
-	else if(outerSegments !== null && outerSegments !== undefined){
-		btn.click();
-		console.log("span, onclick");
-	}
-}  
-
-
-
-for(let i=0;i<divIndices.length;i++){
-	divButtons[divIndices[i]].click();
 }
 
-for(let i=0;i<spanIndices.length;i++){
-	spanButtons[spanIndices[i]].click();
-}
-
-console.log("divs: "+divIndices.toString());
-console.log("spans: "+spanIndices.toString());
+clickIndex("div");
+clickIndex("span");
+clickIndex("blockquote");
 
 
 
@@ -236,8 +143,9 @@ function handleInnerSpoilerDiv(el){
 	let curClass = el.className;
 	let divs = el.getElementsByTagName("div");
 	let spans = el.getElementsByTagName("span");
+	let blockquotes = el.getElementsByTagName("blockquote");
 	
-	let subs = mergeElementArrays(divs,spans);
+	let subs = mergeElementArrays(mergeElementArrays(divs,spans),blockquotes);
 	
 	let classSegments = curClass.match(/spoiler/ig);
 	let curDisplay = el.style.display;
@@ -276,10 +184,3 @@ function handleInnerSpoilerDiv(el){
 	}
 	return result;
 }
-
-// aka reborn
-
-
-
-
-  
