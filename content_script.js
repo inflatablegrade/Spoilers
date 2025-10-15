@@ -98,7 +98,7 @@ function handleElementsByTagNameNested(elementType){
 				}
 
 			}
-			if(childSpoilerExists === faise && smallContainerSpoilers === 0){
+			if(childSpoilerExists === false && smallContainerSpoilers === 0){
 				itm.click();
 			}
 		}
