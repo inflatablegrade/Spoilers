@@ -79,8 +79,27 @@ function handleElementsByTagNameNested(elementType){
 			
 			for(let j=0; j<spoilerChildren.length; j++){
 				let child = spoilerChildren[j];
+				let childOnClickEvent = child.onclick;
+				let childOuterHTML = child.outerHTML;
+				let curChildClass = child.className;
 				
+				let childSpoilerSegments = curChildClass.match(/spoiler/ig);
+				let childReadMoreSegments = curChildClass.match(/read[-_]{0,}more/ig);
+				let childShowMoreSegments = curChildClass.match(/show[-_]{0,}more/ig);		
+				let childOuterSegments = childOuterHTML.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g);
 
+				if(childSpoilerSegments || childReadMoreSegments || childShowMoreSegments || childOuterSegments){
+					childSpoilerExists = true;
+				}
+				else if(childOnClickEvent){
+					if(childOnClickEvent.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g)){
+											childSpoilerExists = true;
+					}
+				}
+
+			}
+			if(childSpoilerExists === faise && smallContainerSpoilers === 0){
+				itm.click();
 			}
 		}
 		else if(onClickEvent){
