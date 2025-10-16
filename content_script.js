@@ -10,6 +10,7 @@ var itmArrays = {
 		}
 	}
 
+var smallContainerSpoilers = 0;
 
 function handleElementsByTagName(elementType){
 	let itms = document.getElementsByTagName(elementType);
@@ -28,14 +29,17 @@ function handleElementsByTagName(elementType){
 		if(spoilerSegments || readMoreSegments || showMoreSegments){
 			console.log("clicking " + elementType);
 			itm.click();
+			smallContainerSpoilers++;
 		}
 		else if(onClickEvent){
 			if(onClickEvent.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g)){
 				if(elementType=="input" && itm.type == "button"){
 					itm.click();
+					smallContainerSpoilers++;
 				}
 				else if(elementType != "button"){
 					itm.click();
+					smallContainerSpoilers++;
 				}
 			}
 		}
@@ -68,9 +72,36 @@ function handleElementsByTagNameNested(elementType){
 			console.log("div, no subs");
 		}
 
-//		if(spoilerSegments || readMoreSegments || showMoreSegments){
-//			itm.click();
-//		}
+		if(spoilerSegments || readMoreSegments || showMoreSegments){
+//			itm.click(); // only click if no small containers are spoilers, and there's no child element with spoiler characteristics
+			let spoilerChildren = itm.children;
+			let childSpoilerExists = false;
+			
+			for(let j=0; j<spoilerChildren.length; j++){
+				let child = spoilerChildren[j];
+				let childOnClickEvent = child.onclick;
+				let childOuterHTML = child.outerHTML;
+				let curChildClass = child.className;
+				
+				let childSpoilerSegments = curChildClass.match(/spoiler/ig);
+				let childReadMoreSegments = curChildClass.match(/read[-_]{0,}more/ig);
+				let childShowMoreSegments = curChildClass.match(/show[-_]{0,}more/ig);		
+				let childOuterSegments = childOuterHTML.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g);
+
+				if(childSpoilerSegments || childReadMoreSegments || childShowMoreSegments || childOuterSegments){
+					childSpoilerExists = true;
+				}
+				else if(childOnClickEvent){
+					if(childOnClickEvent.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g)){
+											childSpoilerExists = true;
+					}
+				}
+
+			}
+			if(childSpoilerExists === false && smallContainerSpoilers === 0){
+				itm.click();
+			}
+		}
 		else if(onClickEvent){
 			if(onClickEvent.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g)){
 				itm.click();
