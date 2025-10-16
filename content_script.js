@@ -10,7 +10,7 @@ var itmArrays = {
 		}
 	}
 
-var smallContainerSpoilers = 0;
+//var smallContainerSpoilers = 0;
 
 function handleElementsByTagName(elementType){
 	let itms = document.getElementsByTagName(elementType);
@@ -29,7 +29,7 @@ function handleElementsByTagName(elementType){
 		if(spoilerSegments || readMoreSegments || showMoreSegments){
 			console.log("clicking " + elementType);
 			itm.click();
-			smallContainerSpoilers++;
+//			smallContainerSpoilers++;
 		}
 		else if(onClickEvent){
 			if(onClickEvent.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g)){
@@ -60,13 +60,13 @@ function handleElementsByTagNameNested(elementType){
 		let onClickEvent = itm.onclick;
 		let outerHTML = itm.outerHTML;
 		let curClass = itm.className;
-
+		
 		let spoilerSegments = curClass.match(/spoiler/ig);
 		let readMoreSegments = curClass.match(/read[-_]{0,}more/ig);
 		let showMoreSegments = curClass.match(/show[-_]{0,}more/ig);		
 		let outerSegments = outerHTML.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g);
 
-		if(handleInnerSpoilerDiv(itm)==1){
+		if(handleInnerSpoilerContainer(itm)==1){
 //			itm.click();
 			itmArrays[elementType].indicesArray.push(i);
 			console.log("div, no subs");
@@ -76,6 +76,10 @@ function handleElementsByTagNameNested(elementType){
 //			itm.click(); // only click if no small containers are spoilers, and there's no child element with spoiler characteristics
 			let spoilerChildren = itm.children;
 			let childSpoilerExists = false;
+			
+			console.log("large container type: " + elementType);
+			console.log(spoilerChildren);
+
 			
 			for(let j=0; j<spoilerChildren.length; j++){
 				let child = spoilerChildren[j];
@@ -93,12 +97,13 @@ function handleElementsByTagNameNested(elementType){
 				}
 				else if(childOnClickEvent){
 					if(childOnClickEvent.match(/[.]{1}style[.]{1}display[^=]{0,}[=]{1,2}[^=;]{0,}["']{1}none["']{1}/g)){
-											childSpoilerExists = true;
+						childSpoilerExists = true;
 					}
 				}
 
 			}
-			if(childSpoilerExists === false && smallContainerSpoilers === 0){
+//			if(childSpoilerExists === false && smallContainerSpoilers == 0){
+			if(childSpoilerExists === false){
 				itm.click();
 			}
 		}
@@ -170,7 +175,7 @@ function mergeElementArrays(type1,type2){
 }
 
 
-function handleInnerSpoilerDiv(el){
+function handleInnerSpoilerContainer(el){
 	let curClass = el.className;
 	let divs = el.getElementsByTagName("div");
 	let spans = el.getElementsByTagName("span");
